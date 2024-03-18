@@ -26,5 +26,9 @@ btn_iniciar.pack(pady=10)
 btn_salir = tk.Button(ventana, text="Salir del Juego", command=salir_del_juego)
 btn_salir.pack(pady=10)
 
+etiqueta_jesus = tk.Label(ventana, text="Jesús estuvo aquí")
+etiqueta_jesus.config(fg="yellow", bg="red", font=("Arial", 50, "bold"))
+etiqueta_jesus.pack()
+
 # Mostrar la ventana
 ventana.mainloop()
