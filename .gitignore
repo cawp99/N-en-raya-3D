@@ -1,3 +1,4 @@
 log.log
 *.pdf
 test.py
+__pycache__
