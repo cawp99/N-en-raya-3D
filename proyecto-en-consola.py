@@ -93,6 +93,7 @@ while True:
             elif entry2 == "2":
                 print("Empieza el juego...")
                 secundario = False
+                funciones.jugar(jugador1, jugador2, N)
 
             else:
                 print("Opción no válida")
