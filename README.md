@@ -12,16 +12,24 @@ Una vez que se crean los jugadores de manera satisfactoria, se crean dos instanc
 
 Al seleccionar "Iniciar juego", se muestran los datos esenciales (nombre de los jugadores, puntaje, quién tiene el turno) y además se muestra una grilla
 correspondiente a la versión 2D del tablero, con valores para las casillas "-" por inicializarse vacías. En los bordes de la grilla se muestran coordenadas
-para que los usuarios sepan qué casilla modificar
+para que los usuarios sepan qué casilla modificar.
 
-### Cosas en desarrollo
+Ya se puede jugar **una** ronda de manera satisfactoria. La entrada de casillas para modificar es a través de coordenadas (X,Y) horizontal y luego vertical
+como se muestran en la grilla que sale cuando se imprime el tablero. El juego ya es capaz de detectar cuando un jugador gana la ronda, además de poder
+ir cambiando turno por turno para mostrar el nombre cuando se imprime el estado del juego y modificar las casillas con la ficha correspondiente.
 
-Estoy trabajando en la jugabilidad de las rondas, que los usuarios puedan seleccionar casillas y que se modifiquen apropiadamente. Después de eso implementaré
-alguna manera para que se verifiquen los estados de finalización de una ronda (lineas), que se aumente el punto correspondientemente y que se inicie una nueva.
+Aún faltan:
+  * Que no se puedan jugar casillas no vacías
+  * Que el juego detecte que cuando se hayan acabado las casillas vacías, la ronda termine y muestre un empate
+  * Poder jugar una ronda tras otra manteniendo puntaje pero cambiando fichas. Si existe un atributo de puntaje en la clase Jugador y un método `ganar_punto` que es para esto pero a la hora de implementar el juego como tal, aún no sale.
 
-**Importante:** A diferencia de otras partes del código, como el resultado que nos piden es en interfaz gráfica y no en consola, esta parte del código
-no estará tan blindada con manejo de excepciones y consideraciones estéticas, es más para probar las funciones de verificación y de manejo de las
-rondas.
+### Notas
+
+**Importante:** A diferencia de otras partes del código, la parte de imprimir el tablero en consola y de introducir las coordenadas con la entrada estándar, como el resultado que nos piden es en interfaz gráfica y no en consola, esta parte del código no estará tan blindada con manejo de excepciones y consideraciones estéticas, es más para probar las funciones de verificación y de manejo de las rondas. *Asumimos que los desarrolladores que lo ejecuten como parte de esta etapa preliminar intentarán no buscar excepciones intencionalmente...* ;)
+
+### En desarrollo 
+
+Terminé por hoy, sigo mañana. Creo xd iré por lo que dice "Aún falta" arriba.
 
 ### Sobre las clases
 
