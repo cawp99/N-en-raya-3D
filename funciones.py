@@ -73,20 +73,20 @@ def imprimir_tablero(tablero:'Tablero_2D') -> None:
     tablero_en_consola(tablero)
 
 
-def casilla_en_consola(casilla:'Casilla')->str:
+def casilla_en_consola(n:int)->str:
     """Una función para imprimir el estado de la casilla pero
     de manera visual.
     
     ### Argumento
-    * `casilla`: Una casilla de la clase Casilla.
+    * `n`: Entero que representa el estado de una casilla.
     
     ### Retorno
-    * str: "-" si el estado es 0, "X" si el estado es 1, "O" si el estado es 2."""
+    * str: "-" si `n` es 0, "X" si `n` es 1, "O" si `n` es 2."""
 
-    estado:int = getattr(casilla, "estado")
-    if estado == 0:
+
+    if n == 0:
         return "-"
-    elif estado == 1:
+    elif n == 1:
         return "X"
     else:
         return "O"
@@ -99,13 +99,13 @@ def tablero_en_consola(tablero:'Tablero_2D')->None:
     * `tablero`: Un objeto de la clase Tablero_2D
 
     ### Ejecución
-    Imprime un arreglo cuadrado del mismo lado que el lado del tablero. Cada
+    Imprime un arreglo cuadrado lado 2 más que el lado del tablero. Cada
     casilla tiene un caracter correspondiente al estado de la casilla de esa posición.
     En los bordes se muestran las coordenadas X, Y para seleccionar una casilla.
     """
 
     lado:int = getattr(tablero, "lado")
-    estado:List[List['Casilla']] = getattr(tablero, "estado")
+    estado:List[List[int]] = tablero.matriz_numerica()
 
     for i in range(lado+2):
         for j in range(lado+2):
@@ -144,12 +144,229 @@ def jugar(jugador1:'Jugador', jugador2:'Jugador', N:int)->None:
     """
 
     logging.info("Empieza el juego")
-    tablero = Tablero_2D(jugador1,jugador2,N) 
+    tablero : 'Tablero_2D'= Tablero_2D(jugador1,jugador2,N)
+    matriz : List[List[int]] = []
     logging.debug("El turno actual vale: " + str(getattr(tablero, "turno")))       
     
-    finalizado:bool = False
-    while not finalizado:
+    juego_finalizado:bool = False
+    candidato_ganador:int = -1
+    while not juego_finalizado:
         print("Estado del juego:")
         imprimir_tablero(tablero)
-        break
         
+        indices:List[int] = pedir_movimiento()
+        tablero.actualizar_casilla(indices[0], indices[1])
+
+        matriz = tablero.matriz_numerica()
+
+        candidato_ganador = hay_ganador(matriz)
+        if candidato_ganador == 0: #no hay ganador
+            tablero.siguiente_turno()
+            continue
+        elif candidato_ganador == 1: #gana el jugador de las X
+            juego_finalizado = True
+            print("Ronda finalizada, el ganador es " + getattr(tablero.jugadores[0], "nombre"))
+            tablero_en_consola(tablero)
+        elif candidato_ganador == 2: #gana el jugador de las O
+            juego_finalizado = True
+            print("Ronda finalizada, el ganador es " + getattr(tablero.jugadores[1], "nombre"))
+            tablero_en_consola(tablero)
+        
+def verificacion_horizontal(matriz:List[List[int]], fila:int)->bool:
+    """
+    Una función que verifica si una fila en una matriz tiene todas sus entradas iguales.
+
+    ### Argumentos
+    * `matriz`: Una matriz cuadrada de enteros
+    * `fila`: Un índice entero que representa un número de fila
+
+    ### Retorno
+    bool: True si la fila con índice `fila` tiene todas sus entradas iguales. 
+    False en caso contrario.
+    """
+
+    if fila not in range(len(matriz)):
+        raise ValueError("El número de fila no es válido")
+    
+    
+    for i in range(1, len(matriz)):
+        if matriz[fila][i] != matriz[fila][i-1]:
+            return False
+        
+    return True #solo si son iguales
+
+def verificacion_vertical(matriz:List[List[int]], columna:int)->bool:
+    """
+    Una función que verifica si una columna en una matriz tiene todas 
+    sus entradas iguales.
+
+    ### Argumentos
+    * `matriz`: Una matriz cuadrada de enteros
+    * `columna`: Un índice entero que representa un número de fila
+
+    ### Retorno
+    bool: True si la columna con índice `columna` tiene todas sus entradas iguales. 
+    False en caso contrario.
+    """
+
+    if columna not in range(len(matriz)):
+        raise ValueError("El número de fila no es válido")
+    
+    
+    for i in range(1, len(matriz)):
+        if matriz[i][columna] != matriz[i-1][columna]:
+            return False
+        
+    return True #solo si son iguales
+
+
+def verificacion_diagonal(matriz:List[List[int]])->bool:
+    """
+    Una función que verifica si la diagonal principal en una matriz tiene 
+    todas sus entradas iguales.
+
+    ### Argumentos
+    * `matriz`: Una matriz cuadrada de enteros
+
+    ### Retorno
+    bool: True si la diagonal principal tiene todas las entradas iguales. False
+    en caso contrario
+    """
+
+    for i in range(1,len(matriz)):
+        if matriz[i][i] != matriz[i-1][i-1]:
+            return False
+        
+    return True
+
+def verificacion_diagonal_inversa(matriz:List[List[int]])->bool:
+    """
+    Una función que verifica si la diagonal secundaria (inversa) en una matriz tiene 
+    todas sus entradas iguales.
+
+    ### Argumentos
+    * `matriz`: Una matriz cuadrada de enteros
+
+    ### Retorno
+    bool: True si la diagonal secundaria tiene todas las entradas iguales. False
+    en caso contrario
+    """
+
+    for i in range(1,len(matriz)):
+        if matriz[len(matriz)-1-i][i] != matriz[len(matriz)-i][i-1]:
+            return False
+        
+    return True
+
+def verificacion_completa(matriz:List[List[int]])->List[List[int]]:
+    """
+    Una función que verifica si alguna de las columnas, filas o diagonales
+    de una matriz tienen entradas iguales y produce una lista con estas
+    líneas iguales.
+
+    ### Argumento
+    * `matriz`: List[List[int]]: Una matriz cuadrada de enteros
+
+    ### Retorno
+    List[List[int]]: Una lista que contiene listas de enteros.
+    Si la lista está vacía, ninguna diagonal, columna o fila tiene entradas iguales.
+
+    Si la lista está no vacía, el primer elemento de una lista dentro del retorno
+    vale 1 si se corresponde con una fila, 2 si se corresponde con una columna, 
+    3 si es la diagonal principal y 4 si es la diagonal secundaria.
+    En las listas dentro del retorno con primeras entradas 1 o 2 (filas o columnas),
+    la segunda entrada es el número de fila (o columna, respectivamente) correspondiente
+    que tiene entradas iguales. Si la primera entrada de la lista dentro del retorno
+    es 3 o 4 (diagonales), las segundas entradas valen -1.
+    """
+
+    retorno : List[List[int]] = []
+    for i in range(len(matriz)):
+        if verificacion_horizontal(matriz, i):
+            retorno.append([1, i])
+    
+    for i in range(len(matriz)):
+        if verificacion_vertical(matriz, i):
+            retorno.append([2, i])
+
+    if verificacion_diagonal(matriz):
+        retorno.append([3,-1])
+    
+    if verificacion_diagonal_inversa(matriz):
+        retorno.append([4, -1])
+
+    return retorno
+
+def hay_ganador(matriz:List[List[int]])->int:
+    """
+    Una función que recibe un tablero e indica si hay un ganador.
+
+    ### Argumento
+    * `matriz`: Una matriz numérica, como el resultado del método `matriz_numerica`
+    de la clase Tablero_2D
+
+    ### Retorno
+    int: 0 si no hay ganador, 1 si gana el jugador que tiene las "X", 2 si gana el 
+    jugador que tiene las "O"
+    """
+
+    victorias=verificacion_completa(matriz)
+    if len(victorias) == 0:
+        return 0
+    
+    #si hay algunas filas o columnas o diagonales de entradas iguales
+    for linea in victorias:
+        if linea[0]==1: #se trata de una fila
+            if matriz[linea[1]][0] == 0:
+                continue #ignora si son filas de entradas iguales vacías
+            elif matriz[linea[1]][0] == 1:
+                return 1
+            else:
+                return 2
+            
+        elif linea[0]==2: #se trata de una columna
+            if matriz[0][linea[1]] == 0:
+                continue #ignora si son columnas de entradas iguales vacías
+            elif matriz[0][linea[1]] == 1:
+                return 1
+            else:
+                return 2
+            
+        elif linea[0]==3: #diagonal principal
+            if matriz[0][0] == 0:
+                continue #ignora si son digonales de entradas iguales vacías
+            elif matriz[0][0] == 1:
+                return 1
+            else:
+                return 2
+            
+        elif linea[0]==4: #diagonal secundaria
+            if matriz[len(matriz)-1][0] == 0:
+                continue #ignora si son digonales de entradas iguales vacías
+            elif matriz[len(matriz)-1][0] == 1:
+                return 1
+            else:
+                return 2
+
+    #no se activa ningun return
+    return 0 #no hay ganador 
+
+def pedir_movimiento()->List[int]:
+    """Una función para pedir las coordenadas de una casilla, que
+    será usada para actualizar el estado del tablero y finalizar el turno.
+
+    ### Parámetro
+    * `lado`: Un entero que representa el lado N de la matriz NxN del tablero.
+
+    ### Retorno
+    List[int]: Una lista de dos enteros [i,j] que representan los índices de la
+    casilla cuyas coordenadas fueron introducidas por el usuario.
+    """
+
+    print("""Escriba las coordenadas (X,Y) tal como se ven en la grilla
+para ser marcada en su turno.""")
+    x:str = int(input("Coordenada X horizontal: "))
+    y:str = int(input("Coordenada Y vertical: "))
+
+    retorno:List[int] = [y-1, x-1]
+    return retorno

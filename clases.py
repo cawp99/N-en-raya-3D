@@ -134,9 +134,16 @@ class Tablero_2D():
     * `ganador`: Un entero que representa si el juego está inconcluso (0), o quién es el
     ganador del juego (1, 2, 3). El valor 3 representa un empate.
 
+
     ### Métodos
     * Un método constructor
     * `siguiente_turno`: Le da el turno al otro jugador, `turno` se modifica apropiadamente.
+    * `matriz_numerica`: Retorna una matriz numérica NxN de lado N=`lado` que contiene
+    en la entrada [i][j] el valor de `estado` de la Casilla de posición [i][j] de
+    `estado` del tablero. En otras palabras, `matriz_numerica` retorna una matriz de enteros
+    0, 1 y 2.
+    * `actualizar_casilla`: Dependiendo de quién es el turno, recibe las coordenadas
+    correspondientes a una casilla y la actualiza para representar quién la modificó
     """
 
     def __init__(self, jugador1:'Jugador', jugador2:'Jugador', lado:int)->'Tablero_2D':
@@ -156,7 +163,6 @@ class Tablero_2D():
         * `estado` igual a una matriz `lado`x`lado` de Casillas vacías
         * `jugadores` consistiendo en una lista formada por [jugador1, jugador2]
         * `turno` igual a 1 (Jugador 1 va primero en la primera ronda)
-        * `ganador` igual a 0 (el juego tiene que jugarse)
         """
 
         try:
@@ -184,7 +190,6 @@ class Tablero_2D():
 
         self.turno : int = 1
 
-        self.ganador : int = 0
 
     def siguiente_turno(self):
         """Un método para indicar que el turno es del próximo jugador ahora."""
@@ -193,6 +198,41 @@ class Tablero_2D():
         else:
             self.turno = 1
 
+    def matriz_numerica(self)->List[List[int]]:
+        """Un método que devuelve la matriz numérica de estados asociados a cada casilla
+    del tablero.
     
+    ### Retorno
+    List[List[int]]: Una matriz NxN de lado N = lado del tablero que contiene
+    en la entrada [i][j] el valor de `estado` de la Casilla de posición [i][j] de
+    `estado` del tablero. En otras palabras, `matriz_numerica` retorna una matriz de enteros
+    0, 1 y 2.
+        """
 
+        matriz:List[List[int]]=[]
+        fila:List[int]=[]
+        for i in range(self.lado):
+            fila=[]
+            for j in range(self.lado):
+                fila.append(getattr(self.estado[i][j], "estado"))
+            
+            matriz.append(fila)
 
+        return matriz
+
+    def actualizar_casilla(self, fila:int, columna:int):
+        """Un método para actualizar el valor de una casilla,
+        dependiendo de quién sea el jugador con el turno
+        que la seleccione
+        
+        ### Argumentos
+        * `fila`: Un número de fila válido en la matriz que representa el tablero
+        * `columna`: Un número de columna válido en la matriz que representa el tablero
+
+        ### Ejecución
+        Accede a la casilla de posición [i][j] en el estado del tablero y modifica su
+        atributo estado para que refleje el jugador que la acaba de seleccionar.
+        """
+
+        casilla:'Casilla' = self.estado[fila][columna]
+        casilla.actualizar(self.turno)
