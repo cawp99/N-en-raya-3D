@@ -150,19 +150,29 @@ def jugar(jugador1:'Jugador', jugador2:'Jugador', N:int)->None:
     
     juego_finalizado:bool = False
     candidato_ganador:int = -1
+    turno_finalizado:bool = False
+    indices:List[int] = []
     while not juego_finalizado:
         print("Estado del juego:")
         imprimir_tablero(tablero)
-        
-        indices:List[int] = pedir_movimiento()
-        tablero.actualizar_casilla(indices[0], indices[1])
+        turno_finalizado = False
+        while not turno_finalizado:
+            indices = pedir_movimiento()
+            try:
+                tablero.actualizar_casilla(indices[0], indices[1])
+            except Exception as e:
+                print(e)
+                continue
+
+            turno_finalizado = True
 
         matriz = tablero.matriz_numerica()
 
+        #verificamos si hay ganador
         candidato_ganador = hay_ganador(matriz)
         if candidato_ganador == 0: #no hay ganador
             tablero.siguiente_turno()
-            continue
+            pass #continuamos
         elif candidato_ganador == 1: #gana el jugador de las X
             juego_finalizado = True
             print("Ronda finalizada, el ganador es " + getattr(tablero.jugadores[0], "nombre"))
@@ -171,6 +181,13 @@ def jugar(jugador1:'Jugador', jugador2:'Jugador', N:int)->None:
             juego_finalizado = True
             print("Ronda finalizada, el ganador es " + getattr(tablero.jugadores[1], "nombre"))
             tablero_en_consola(tablero)
+
+        #verificamos si ya no hay más movimientos legales
+        if tablero.movimientos_restantes() == 0:
+            juego_finalizado = True #terminó, pero en empate
+            print("Ronda finalizada. Es un empate.")
+            tablero_en_consola(tablero)
+
         
 def verificacion_horizontal(matriz:List[List[int]], fila:int)->bool:
     """

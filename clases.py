@@ -144,6 +144,8 @@ class Tablero_2D():
     0, 1 y 2.
     * `actualizar_casilla`: Dependiendo de quién es el turno, recibe las coordenadas
     correspondientes a una casilla y la actualiza para representar quién la modificó
+    * `movimientos_restantes`: Retorna un entero correspondiente a la cantidad de movimientos
+    legales que quedan en el tablero (hasta 0, que significa que no hay más)
     """
 
     def __init__(self, jugador1:'Jugador', jugador2:'Jugador', lado:int)->'Tablero_2D':
@@ -235,4 +237,25 @@ class Tablero_2D():
         """
 
         casilla:'Casilla' = self.estado[fila][columna]
-        casilla.actualizar(self.turno)
+        if getattr(casilla, "estado") == 0: #está vacía, movimiento legal
+            casilla.actualizar(self.turno)
+        else: #no vacía
+            raise ValueError("No se puede modificar una casilla no vacía")
+        
+    def movimientos_restantes(self)->int:
+        """Un método que retorna la cantidad de movimientos restantes posibles
+        a partir de la posición actual del tablero.
+        
+        ### Retorno
+        int: La cantidad de casillas vacías en el tablero."""
+
+        matriz:List[List[int]]=self.matriz_numerica()
+        lado:int = self.lado
+
+        suma:int = 0
+        for i in range(lado):
+            for j in range(lado):
+                if matriz[i][j] == 0:
+                    suma = suma + 1
+
+        return suma

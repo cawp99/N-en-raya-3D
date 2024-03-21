@@ -59,7 +59,11 @@ Representa el estado del tablero de un juego en dos dimensiones. Aquí está su 
 >   ### Métodos
 >   * Un método constructor
 >   * `siguiente_turno`: Le da el turno al otro jugador, `turno` se modifica apropiadamente.
-
-
-
-
+>   * `matriz_numerica`: Retorna una matriz numérica NxN de lado N=`lado` que contiene
+>   en la entrada [i][j] el valor de `estado` de la Casilla de posición [i][j] de
+>   `estado` del tablero. En otras palabras, `matriz_numerica` retorna una matriz de enteros
+>   0, 1 y 2.
+>   * `actualizar_casilla`: Dependiendo de quién es el turno, recibe las coordenadas
+>   correspondientes a una casilla y la actualiza para representar quién la modificó
+>   * `movimientos_restantes`: Retorna un entero correspondiente a la cantidad de movimientos
+>   legales que quedan en el tablero (hasta 0, que significa que no hay más)
