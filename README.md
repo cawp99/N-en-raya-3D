@@ -18,7 +18,7 @@ La entrada de casillas para modificar es a través de coordenadas (X,Y) horizont
 ir cambiando turno por turno para mostrar el nombre cuando se imprime el estado del juego y modificar las casillas con la ficha correspondiente.
 
 Ya se puede jugar varias rondas después de haber terminado una ronda y gracias a intercambiar
-los argumentos posicionales a la hora de llamar a la función `jugar``y al método `ganar_punto` de la clase Jugador, se almacenan los puntajes entre ronda.
+los argumentos posicionales a la hora de llamar a la función `jugar`y al método `ganar_punto` de la clase Jugador, se almacenan los puntajes entre ronda.
 
 ### Notas
 
