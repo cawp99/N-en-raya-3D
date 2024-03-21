@@ -137,7 +137,11 @@ def jugar(jugador1:'Jugador', jugador2:'Jugador', N:int)->None:
     ### Ejecución
     Empieza el juego, se ejecuta un bucle turno por turno en donde se imprime la 
     información relevante al estado del juego actual, y sale un menú donde se
-    puede escoger la casilla seleccionada por el turno correspondiente.
+    puede escoger la casilla seleccionada por el turno correspondiente. 
+
+    Se tiene un bucle hasta que se introduzcan coordenadas vacías (no te deja modificar
+    casillas ya marcadas). Cuando el juego termina y no es empate, se agrega un punto 
+    al jugador ganador.
     
     El bucle continúa hasta que se haya logrado terminar la partida. En ese caso,
     si hay un ganador, se incrementa su puntaje en 1 punto. 
@@ -177,10 +181,12 @@ def jugar(jugador1:'Jugador', jugador2:'Jugador', N:int)->None:
             juego_finalizado = True
             print("Ronda finalizada, el ganador es " + getattr(tablero.jugadores[0], "nombre"))
             tablero_en_consola(tablero)
+            tablero.jugadores[0].ganar_punto()
         elif candidato_ganador == 2: #gana el jugador de las O
             juego_finalizado = True
             print("Ronda finalizada, el ganador es " + getattr(tablero.jugadores[1], "nombre"))
             tablero_en_consola(tablero)
+            tablero.jugadores[1].ganar_punto()
 
         #verificamos si ya no hay más movimientos legales
         if tablero.movimientos_restantes() == 0:

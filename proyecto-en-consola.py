@@ -93,7 +93,21 @@ while True:
             elif entry2 == "2":
                 print("Empieza el juego...")
                 secundario = False
-                funciones.jugar(jugador1, jugador2, N)
+                loop_rondas:bool = True
+                entry_rondas:str = ""
+                while loop_rondas:
+                    funciones.jugar(jugador1, jugador2, N)
+                    print("¿Desea seguir jugando? 1: Sí. 2: Salir.")
+                    entry_rondas=input("Escoga una opción: ")
+                    if entry_rondas=="1":
+                        [jugador1, jugador2] = [jugador2, jugador1] #se cambian puestos
+                        print("NUEVA RONDA")
+                        continue #siguiente ronda
+                    elif entry_rondas=="2":
+                        loop_rondas = False
+                        secundario = False
+
+
 
             else:
                 print("Opción no válida")

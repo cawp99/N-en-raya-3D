@@ -1,6 +1,6 @@
 ## README
 
-### Fase actual del proyecto: Implementación del juego 2D en consola
+### Fase actual del proyecto: Juego 2D en consola LISTA
 
 Hay varios archivos de Python en el repositorio. El juego 2D en consola lo estoy creando en el archivo `proyecto-en-consola.py`. Además tengo dos archivos auxiliares necesarios, `clases.py` y `funciones.py`, que contienen clases y funciones que estoy usando (respectivamente). Por ahora llevo esto implementado en el juego como tal:
 
@@ -14,22 +14,26 @@ Al seleccionar "Iniciar juego", se muestran los datos esenciales (nombre de los 
 correspondiente a la versión 2D del tablero, con valores para las casillas "-" por inicializarse vacías. En los bordes de la grilla se muestran coordenadas
 para que los usuarios sepan qué casilla modificar.
 
-Ya se puede jugar **una** ronda de manera satisfactoria. La entrada de casillas para modificar es a través de coordenadas (X,Y) horizontal y luego vertical
-como se muestran en la grilla que sale cuando se imprime el tablero. El juego ya es capaz de detectar cuando un jugador gana la ronda, además de poder
+La entrada de casillas para modificar es a través de coordenadas (X,Y) horizontal y luego vertical como se muestran en la grilla que sale cuando se imprime el tablero. El juego ya es capaz de detectar cuando un jugador gana la ronda, además de poder
 ir cambiando turno por turno para mostrar el nombre cuando se imprime el estado del juego y modificar las casillas con la ficha correspondiente.
 
-Aún faltan:
-* Poder jugar una ronda tras otra manteniendo puntaje pero cambiando fichas. Si existe un atributo de puntaje en la clase Jugador y un método `ganar_punto` que es para esto pero a la hora de implementar el juego como tal, aún no sale.
+Ya se puede jugar varias rondas después de haber terminado una ronda y gracias a intercambiar
+los argumentos posicionales a la hora de llamar a la función `jugar``y al método `ganar_punto` de la clase Jugador, se almacenan los puntajes entre ronda.
 
 ### Notas
 
 **Importante:** A diferencia de otras partes del código, la parte de imprimir el tablero en consola y de introducir las coordenadas con la entrada estándar, como el resultado que nos piden es en interfaz gráfica y no en consola, esta parte del código no estará tan blindada con manejo de excepciones y consideraciones estéticas, es más para probar las funciones de verificación y de manejo de las rondas. *Asumimos que los desarrolladores que lo ejecuten como parte de esta etapa preliminar intentarán no buscar excepciones intencionalmente...* ;)
 
-*Tengo sueño para editar mejor esto* Ya la ronda uno funciona bien, no se pueden mover en casillas no vacías y el juego reconoce cuando es un empate.
-
 ### En desarrollo 
 
-Terminé por hoy, sigo mañana. Creo xd iré por lo que dice "Aún falta" arriba.
+¡Terminé la parte de consola!
+
+### Sugerencias para la interfaz gráfica
+
+Las clases funcionan de manera independiente a cómo se imprimen y cómo se modifican las casillas. Supongo que cuando empieces a trabajar con tkinter, se me ocurre que una vez se 
+soliciten los datos de jugadores se creen las instancias de Jugador respectivas y 
+para jugar, esa función puede generar un arreglo dentro un frame de botones que al hacer
+click se pongan como la ficha correspondiente, pero que tambien vayan modificando el tablero con el método `actualizar_casilla` de la clase Tablero_2D porque es la que lleva el juego.
 
 ### Sobre las clases
 
