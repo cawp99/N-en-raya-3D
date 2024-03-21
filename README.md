@@ -19,13 +19,13 @@ como se muestran en la grilla que sale cuando se imprime el tablero. El juego ya
 ir cambiando turno por turno para mostrar el nombre cuando se imprime el estado del juego y modificar las casillas con la ficha correspondiente.
 
 Aún faltan:
-  * Que no se puedan jugar casillas no vacías
-  * Que el juego detecte que cuando se hayan acabado las casillas vacías, la ronda termine y muestre un empate
-  * Poder jugar una ronda tras otra manteniendo puntaje pero cambiando fichas. Si existe un atributo de puntaje en la clase Jugador y un método `ganar_punto` que es para esto pero a la hora de implementar el juego como tal, aún no sale.
+* Poder jugar una ronda tras otra manteniendo puntaje pero cambiando fichas. Si existe un atributo de puntaje en la clase Jugador y un método `ganar_punto` que es para esto pero a la hora de implementar el juego como tal, aún no sale.
 
 ### Notas
 
 **Importante:** A diferencia de otras partes del código, la parte de imprimir el tablero en consola y de introducir las coordenadas con la entrada estándar, como el resultado que nos piden es en interfaz gráfica y no en consola, esta parte del código no estará tan blindada con manejo de excepciones y consideraciones estéticas, es más para probar las funciones de verificación y de manejo de las rondas. *Asumimos que los desarrolladores que lo ejecuten como parte de esta etapa preliminar intentarán no buscar excepciones intencionalmente...* ;)
+
+*Tengo sueño para editar mejor esto* Ya la ronda uno funciona bien, no se pueden mover en casillas no vacías y el juego reconoce cuando es un empate.
 
 ### En desarrollo 
 
