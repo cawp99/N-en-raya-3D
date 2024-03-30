@@ -120,6 +120,8 @@ def guardar_datos()->bool:
         msg.pack()
         msg2=tk.Label(err, text=e)
         msg2.pack()
+        aceptar = tk.Button(err, text="Aceptar", command=err.destroy)
+        aceptar.pack()
         
     
     datos_guardados = True 
@@ -153,14 +155,16 @@ def menu_inicial():
     btn_salir = tk.Button(main_frame, text="Salir del Juego", command=salir_del_juego)
     btn_salir.pack(pady=10)
 
-def empezar_juego():
+def empezar_juego(first:bool = True):
     """Genera el tablero y empieza el juego"""
     global Jugador1
     global Jugador2
     global tablero 
     
-    Jugador1 = clases.Jugador(nombre_jug1, "X")
-    Jugador2 = clases.Jugador(nombre_jug2, "O")
+    if first:
+        Jugador1 = clases.Jugador(nombre_jug1, "X")
+        Jugador2 = clases.Jugador(nombre_jug2, "O")
+
     tablero = clases.Tablero_2D(Jugador1, Jugador2, tamaño)
     print("Juego creado")
 
@@ -196,10 +200,17 @@ def datos_tablero():
     datos.pack()
 
     label_jug1:tk.Label = tk.Label(datos, text=f"El jugador 1 es {getattr(Jugador1, 'nombre')}")
-    label_jug1.pack(side="left", padx=10)
+    label_jug1.grid(row=0, column=0, padx=10)
 
     label_jug1:tk.Label = tk.Label(datos, text=f"El jugador 2 es {getattr(Jugador2, 'nombre')}")
-    label_jug1.pack(side="right", padx=10) 
+    label_jug1.grid(row=0, column=1, padx=10)
+
+    label_puntaje_jug1:tk.Label = tk.Label(datos, text=f"Puntaje: {getattr(Jugador1, 'puntaje')}")
+    label_puntaje_jug1.grid(row=1, column=0)
+
+    label_puntaje_jug2:tk.Label = tk.Label(datos, text=f"Puntaje: {getattr(Jugador2, 'puntaje')}")
+    label_puntaje_jug2.grid(row=1, column=1)
+
 
     frame_turno = tk.Frame(main_frame)
     frame_turno.pack()
@@ -211,15 +222,31 @@ def datos_tablero():
 def casilla_presionada(event): #solo para botones de casilla
     fila = event.widget.grid_info()['row']
     columna = event.widget.grid_info()['column']
-    tablero.actualizar_casilla(fila, columna)
-    event.widget.config(bg="seashell4")
 
-    if getattr(tablero,"turno")==1:
-        event.widget.config(text="X", fg="salmon")
-    else:
-        event.widget.config(text="O", fg="SkyBlue1")
+    continue_exec = True
 
-    verificar_ganador()
+    estado = getattr(tablero, "estado")
+    if getattr(estado[fila][columna], "estado") != 0:
+        err=tk.Toplevel(ventana)
+        err.title("3rr0r")
+        msg=tk.Label(err, text="Ocurrió un error", fg="Red")
+        msg.pack()
+        msg2=tk.Label(err, text="No puedes seleccionar casillas ya seleccionadas")
+        msg2.pack()
+        aceptar = tk.Button(err, text="Aceptar", command=err.destroy)
+        aceptar.pack()
+        continue_exec = False
+
+    if continue_exec:
+        tablero.actualizar_casilla(fila, columna)
+        event.widget.config(bg="seashell4")
+
+        if getattr(tablero,"turno")==1:
+            event.widget.config(text="X", fg="salmon")
+        else:
+            event.widget.config(text="O", fg="SkyBlue1")
+
+        verificar_ganador()
 
 def imprimir_tablero():
     """Imprime el tablero con menús para cada casilla:"""
@@ -258,7 +285,7 @@ def ventana_fin_de_ronda(n:int):
     msg_label = tk.Label(vg, text=txt)
     msg_label.pack()
 
-    btn_continuar = tk.Button(vg, text="Continuar")
+    btn_continuar = tk.Button(vg, text="Continuar", command=continuar)
     btn_menu = tk.Button(vg, text="Menú Principal", command=menu_inicial_vg)
     btn_continuar.pack()
     btn_menu.pack()
@@ -466,6 +493,15 @@ def verificacion_completa(matriz:List[List[int]])->List[List[int]]:
 
     return retorno
 
+def continuar():
+    """Función para cuando se quiere continuar entre rondas"""
+
+    global Jugador1
+    global Jugador2
+
+    [Jugador1, Jugador2] = [Jugador2, Jugador1] #se cambian los nombres
+    vg.destroy()
+    empezar_juego(False)
 
 menu_inicial()
 
