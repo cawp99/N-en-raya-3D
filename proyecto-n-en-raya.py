@@ -160,17 +160,30 @@ def empezar_juego(first:bool = True):
     global Jugador1
     global Jugador2
     global tablero 
+    global tableros
+    global niveles_y
     
     if first:
         Jugador1 = clases.Jugador(nombre_jug1, "X")
         Jugador2 = clases.Jugador(nombre_jug2, "O")
 
-    tablero = clases.Tablero_2D(Jugador1, Jugador2, tamaño)
+    tablero = clases.Tablero_3D(Jugador1, Jugador2, tamaño)
     print("Juego creado")
 
     reiniciar_ventana()
     datos_tablero()
-    imprimir_tablero()
+
+    #ahora creamos los tableros para los distintos niveles
+    tableros = tk.Frame(main_frame)
+    tableros.pack()
+    niveles_y = []
+
+    for n in range(tamaño):
+        label_nivel = tk.Label(tableros, text=f"Tablero de nivel: {n}")
+        label_nivel.pack()
+        imprimir_tablero(n)
+
+    print("Niveles guardados: " + str(niveles_y))
 
     espacio_vertical=tk.Frame(main_frame)
     espacio_vertical.config(height=20)
@@ -220,13 +233,27 @@ def datos_tablero():
     actualizar_nombre_turno()
 
 def casilla_presionada(event): #solo para botones de casilla
+
     fila = event.widget.grid_info()['row']
     columna = event.widget.grid_info()['column']
+
+    global nivel
+    
+    #extraemos el nivel
+    pos_y = event.widget.winfo_y()
+
+    #comparamos con los niveles guardados, nos quedamos con el inmediato menor 
+    for i in range(1, len(niveles_y)):
+        nivel = niveles_y[i-1][0]
+        if pos_y < niveles_y[i][1]:
+            break
+
+    print(f"Nivel de la casilla seleccionada: {nivel}")
 
     continue_exec = True
 
     estado = getattr(tablero, "estado")
-    if getattr(estado[fila][columna], "estado") != 0:
+    if getattr(estado[nivel][fila][columna], "estado") != 0:
         err=tk.Toplevel(ventana)
         err.title("3rr0r")
         msg=tk.Label(err, text="Ocurrió un error", fg="Red")
@@ -238,7 +265,7 @@ def casilla_presionada(event): #solo para botones de casilla
         continue_exec = False
 
     if continue_exec:
-        tablero.actualizar_casilla(fila, columna)
+        tablero.actualizar_casilla(nivel, fila, columna)
         event.widget.config(bg="seashell4")
 
         if getattr(tablero,"turno")==1:
@@ -248,10 +275,16 @@ def casilla_presionada(event): #solo para botones de casilla
 
         verificar_ganador()
 
-def imprimir_tablero():
-    """Imprime el tablero con menús para cada casilla:"""
-    frame_botones = tk.Frame(main_frame)
+def imprimir_tablero(n: int):
+    """Imprime el tablero de nivel `n` con menús para cada casilla:"""
+
+    global niveles_y
+
+    frame_botones = tk.Frame(tableros, pady=20)
     frame_botones.pack()
+
+    posicion_y = frame_botones.winfo_y()
+    niveles_y.append([n, posicion_y])
 
     for i in range(tamaño):
         for j in range(tamaño):
@@ -298,7 +331,7 @@ def menu_inicial_vg():
 def verificar_ganador():
     """Verifica si alguien acaba de ganar en este turno"""
 
-    matriz = tablero.matriz_numerica()
+    matriz = tablero.matriz_proyeccion()
     candidato_ganador = hay_ganador(matriz)
     if candidato_ganador == 0: #no hay ganador
         tablero.siguiente_turno()
