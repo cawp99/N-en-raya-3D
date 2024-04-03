@@ -3,6 +3,8 @@
 #se pueda simplemente pasar la parte grafica con tkinter como algo adicional
 #y modificable
 
+# probando editar en otra PC
+
 import clases
 import funciones
 import logging
