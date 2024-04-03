@@ -281,7 +281,11 @@ def casilla_presionada(event): #solo para botones de casilla
         continue_exec = False
 
     if continue_exec:
+        print(f"Actualizamos la casilla {nivel},{fila},{columna}")
         tablero.actualizar_casilla(nivel, fila, columna)
+        casilla_act = tablero.estado[nivel][fila][columna]
+        estado_nuevo = getattr(casilla_act, 'estado')
+        print(f"estado de la casilla: {estado_nuevo}")
         event.widget.config(bg="seashell4")
 
         if getattr(tablero,"turno")==1:
@@ -289,6 +293,7 @@ def casilla_presionada(event): #solo para botones de casilla
         else:
             event.widget.config(text="O", fg="SkyBlue1")
 
+        print(str(tablero.matriz_proyeccion()))
         verificar_ganador()
 
 def imprimir_tablero(n: int):
@@ -351,6 +356,7 @@ def verificar_ganador():
 
     matriz = tablero.matriz_proyeccion()
     candidato_ganador = hay_ganador(matriz)
+    print(f"hay candidato_ganador: {candidato_ganador}")
     if candidato_ganador == 0: #no hay ganador
         tablero.siguiente_turno()
         pass #continuamos
@@ -437,7 +443,9 @@ def verificacion_horizontal(matriz:List[List[int]], fila:int)->bool:
     
     
     for i in range(1, len(matriz)):
-        if matriz[fila][i] != matriz[fila][i-1]:
+        if matriz[fila][i] == 3:
+            pass
+        elif matriz[fila][i] != matriz[fila][i-1]:
             return False
         
     return True #solo si son iguales
@@ -461,7 +469,9 @@ def verificacion_vertical(matriz:List[List[int]], columna:int)->bool:
     
     
     for i in range(1, len(matriz)):
-        if matriz[i][columna] != matriz[i-1][columna]:
+        if matriz[i][columna] == 3:
+            pass
+        elif matriz[i][columna] != matriz[i-1][columna]:
             return False
         
     return True #solo si son iguales
@@ -481,7 +491,9 @@ def verificacion_diagonal(matriz:List[List[int]])->bool:
     """
 
     for i in range(1,len(matriz)):
-        if matriz[i][i] != matriz[i-1][i-1]:
+        if matriz[i][1] == 3:
+            pass
+        elif matriz[i][i] != matriz[i-1][i-1]:
             return False
         
     return True
@@ -500,7 +512,9 @@ def verificacion_diagonal_inversa(matriz:List[List[int]])->bool:
     """
 
     for i in range(1,len(matriz)):
-        if matriz[len(matriz)-1-i][i] != matriz[len(matriz)-i][i-1]:
+        if matriz[len(matriz)-1-i][i] == 3:
+            pass
+        elif matriz[len(matriz)-1-i][i] != matriz[len(matriz)-i][i-1]:
             return False
         
     return True

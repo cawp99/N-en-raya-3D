@@ -358,18 +358,22 @@ class Tablero_3D(Tablero_2D):
         for i in range(self.lado):
             fila=[]
             for j in range(self.lado):
-                fila.append(getattr(self.estado[0][i][j], "estado"))
+                fila.append(0)
             
             matriz.append(fila)
 
-        #ahora vemos los niveles superiores
-        matriz_backup = copy.deepcopy(matriz)
 
-        for k in range(1, self.lado):
+        for k in range(self.lado):
             for i in range(self.lado):
                 for j in range(self.lado):
-                    if getattr(self.estado[k][i][j], "estado") not in [0, matriz_backup[i][j]]:
-                        matriz[i][j] == 3 #hay superposicion de estados
+                    valor = getattr(self.estado[k][i][j], 'estado')
+                    if valor != 0:
+                        if matriz[i][j] == 0:
+                            matriz[i][j] = valor
+                        elif valor == matriz[i][j]:
+                            pass #valor iguales, solo hay de un tipo
+                        else: #valor es distinto a matriz[i][j]
+                            matriz[i][j] = 3 #hay superposicion de estados
                     
 
         return matriz
