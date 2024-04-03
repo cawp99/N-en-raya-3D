@@ -3,6 +3,7 @@ import tkinter as tk
 import logging
 from typing import List, Tuple
 import clases
+import verificaciones
 
 logging.basicConfig(level=logging.DEBUG, filename="log.log", filemode = "w", format="%(levelname)s - %(message)s")
 #Ahora cada vez que se ejecute main, se crea un archivo log.log que contiene el log
@@ -248,21 +249,19 @@ def casilla_presionada(event): #solo para botones de casilla
 
     #comparamos con los niveles guardados, nos quedamos con el inmediato menor 
     for i in range(len(niveles_y)+1):
-        print(f"bucle para hallar nivel. i vale {i}. pos_y vale {pos_y}")
+        #print(f"bucle para hallar nivel. i vale {i}. pos_y vale {pos_y}")
         if i == len(niveles_y):
-            print("Caso borde. Último nivel")
+            #print("Caso borde. Último nivel")
             nivel = niveles_y[-1][0]
             break
         else:
-            print(f"Caso normal.")
+            #print(f"Caso normal.")
             nivel = niveles_y[i][0]-1
-            print(f"nivel vale {nivel}")
+            #print(f"nivel vale {nivel}")
         
         if pos_y < niveles_y[i][1]:
-            print("Se cumplió")
+            #print("Se cumplió")
             break
-        else:
-            print("No se cumple. Siguiente")
 
     print(f"Nivel de la casilla seleccionada: {nivel}")
 
@@ -293,8 +292,31 @@ def casilla_presionada(event): #solo para botones de casilla
         else:
             event.widget.config(text="O", fg="SkyBlue1")
 
-        print(str(tablero.matriz_proyeccion()))
-        verificar_ganador()
+        hipermatriz = tablero.matriz_numerica()
+        matriz = tablero.matriz_proyeccion()
+        mov_restantes = tablero.movimientos_restantes()
+        turn = getattr(tablero,'turno')
+        verificar_ganador(hipermatriz, matriz, mov_restantes, turn)
+
+def verificar_ganador(hipermatriz:List[List[List[int]]], matriz:List[List[int]], movimientos:int, turn:int):
+    """Verifica si alguien acaba de ganar en este turno"""
+
+    candidato_ganador = verificaciones.hay_ganador(hipermatriz, matriz, turn)
+    print(str(hipermatriz))
+    print(f"hay candidato_ganador: {candidato_ganador}")
+    if candidato_ganador == 0: #no hay ganador
+        tablero.siguiente_turno()
+        pass #continuamos
+    elif candidato_ganador == 1: #gana el jugador de las X
+        ventana_fin_de_ronda(1)
+        tablero.jugadores[0].ganar_punto()
+    elif candidato_ganador == 2: #gana el jugador de las O
+        ventana_fin_de_ronda(2)
+        tablero.jugadores[1].ganar_punto()
+
+    #verificamos si ya no hay más movimientos legales
+    if movimientos == 0:
+        ventana_fin_de_ronda(0)
 
 def imprimir_tablero(n: int):
     """Imprime el tablero de nivel `n` con menús para cada casilla:"""
@@ -349,214 +371,6 @@ def ventana_fin_de_ronda(n:int):
 def menu_inicial_vg():
     menu_inicial()
     vg.destroy()
-
-
-def verificar_ganador():
-    """Verifica si alguien acaba de ganar en este turno"""
-
-    matriz = tablero.matriz_proyeccion()
-    candidato_ganador = hay_ganador(matriz)
-    print(f"hay candidato_ganador: {candidato_ganador}")
-    if candidato_ganador == 0: #no hay ganador
-        tablero.siguiente_turno()
-        pass #continuamos
-    elif candidato_ganador == 1: #gana el jugador de las X
-        ventana_fin_de_ronda(1)
-        tablero.jugadores[0].ganar_punto()
-    elif candidato_ganador == 2: #gana el jugador de las O
-        ventana_fin_de_ronda(2)
-        tablero.jugadores[1].ganar_punto()
-
-    #verificamos si ya no hay más movimientos legales
-    if tablero.movimientos_restantes() == 0:
-        ventana_fin_de_ronda(0)
-
-def hay_ganador(matriz:List[List[int]])->int:
-    """
-    Una función que recibe un tablero e indica si hay un ganador.
-
-    ### Argumento
-    * `matriz`: Una matriz numérica, como el resultado del método `matriz_numerica`
-    de la clase Tablero_2D
-
-    ### Retorno
-    int: 0 si no hay ganador, 1 si gana el jugador que tiene las "X", 2 si gana el 
-    jugador que tiene las "O"
-    """
-
-    victorias=verificacion_completa(matriz)
-    if len(victorias) == 0:
-        return 0
-    
-    #si hay algunas filas o columnas o diagonales de entradas iguales
-    for linea in victorias:
-        if linea[0]==1: #se trata de una fila
-            if matriz[linea[1]][0] == 0:
-                continue #ignora si son filas de entradas iguales vacías
-            elif matriz[linea[1]][0] == 1:
-                return 1
-            else:
-                return 2
-            
-        elif linea[0]==2: #se trata de una columna
-            if matriz[0][linea[1]] == 0:
-                continue #ignora si son columnas de entradas iguales vacías
-            elif matriz[0][linea[1]] == 1:
-                return 1
-            else:
-                return 2
-            
-        elif linea[0]==3: #diagonal principal
-            if matriz[0][0] == 0:
-                continue #ignora si son digonales de entradas iguales vacías
-            elif matriz[0][0] == 1:
-                return 1
-            else:
-                return 2
-            
-        elif linea[0]==4: #diagonal secundaria
-            if matriz[len(matriz)-1][0] == 0:
-                continue #ignora si son digonales de entradas iguales vacías
-            elif matriz[len(matriz)-1][0] == 1:
-                return 1
-            else:
-                return 2
-
-    #no se activa ningun return
-    return 0 #no hay ganador 
-
-def verificacion_horizontal(matriz:List[List[int]], fila:int)->bool:
-    """
-    Una función que verifica si una fila en una matriz tiene todas sus entradas iguales.
-
-    ### Argumentos
-    * `matriz`: Una matriz cuadrada de enteros
-    * `fila`: Un índice entero que representa un número de fila
-
-    ### Retorno
-    bool: True si la fila con índice `fila` tiene todas sus entradas iguales. 
-    False en caso contrario.
-    """
-
-    if fila not in range(len(matriz)):
-        raise ValueError("El número de fila no es válido")
-    
-    
-    for i in range(1, len(matriz)):
-        if matriz[fila][i] == 3:
-            pass
-        elif matriz[fila][i] != matriz[fila][i-1]:
-            return False
-        
-    return True #solo si son iguales
-
-def verificacion_vertical(matriz:List[List[int]], columna:int)->bool:
-    """
-    Una función que verifica si una columna en una matriz tiene todas 
-    sus entradas iguales.
-
-    ### Argumentos
-    * `matriz`: Una matriz cuadrada de enteros
-    * `columna`: Un índice entero que representa un número de fila
-
-    ### Retorno
-    bool: True si la columna con índice `columna` tiene todas sus entradas iguales. 
-    False en caso contrario.
-    """
-
-    if columna not in range(len(matriz)):
-        raise ValueError("El número de fila no es válido")
-    
-    
-    for i in range(1, len(matriz)):
-        if matriz[i][columna] == 3:
-            pass
-        elif matriz[i][columna] != matriz[i-1][columna]:
-            return False
-        
-    return True #solo si son iguales
-
-
-def verificacion_diagonal(matriz:List[List[int]])->bool:
-    """
-    Una función que verifica si la diagonal principal en una matriz tiene 
-    todas sus entradas iguales.
-
-    ### Argumentos
-    * `matriz`: Una matriz cuadrada de enteros
-
-    ### Retorno
-    bool: True si la diagonal principal tiene todas las entradas iguales. False
-    en caso contrario
-    """
-
-    for i in range(1,len(matriz)):
-        if matriz[i][1] == 3:
-            pass
-        elif matriz[i][i] != matriz[i-1][i-1]:
-            return False
-        
-    return True
-
-def verificacion_diagonal_inversa(matriz:List[List[int]])->bool:
-    """
-    Una función que verifica si la diagonal secundaria (inversa) en una matriz tiene 
-    todas sus entradas iguales.
-
-    ### Argumentos
-    * `matriz`: Una matriz cuadrada de enteros
-
-    ### Retorno
-    bool: True si la diagonal secundaria tiene todas las entradas iguales. False
-    en caso contrario
-    """
-
-    for i in range(1,len(matriz)):
-        if matriz[len(matriz)-1-i][i] == 3:
-            pass
-        elif matriz[len(matriz)-1-i][i] != matriz[len(matriz)-i][i-1]:
-            return False
-        
-    return True
-
-def verificacion_completa(matriz:List[List[int]])->List[List[int]]:
-    """
-    Una función que verifica si alguna de las columnas, filas o diagonales
-    de una matriz tienen entradas iguales y produce una lista con estas
-    líneas iguales.
-
-    ### Argumento
-    * `matriz`: List[List[int]]: Una matriz cuadrada de enteros
-
-    ### Retorno
-    List[List[int]]: Una lista que contiene listas de enteros.
-    Si la lista está vacía, ninguna diagonal, columna o fila tiene entradas iguales.
-
-    Si la lista está no vacía, el primer elemento de una lista dentro del retorno
-    vale 1 si se corresponde con una fila, 2 si se corresponde con una columna, 
-    3 si es la diagonal principal y 4 si es la diagonal secundaria.
-    En las listas dentro del retorno con primeras entradas 1 o 2 (filas o columnas),
-    la segunda entrada es el número de fila (o columna, respectivamente) correspondiente
-    que tiene entradas iguales. Si la primera entrada de la lista dentro del retorno
-    es 3 o 4 (diagonales), las segundas entradas valen -1.
-    """
-
-    retorno : List[List[int]] = []
-    for i in range(len(matriz)):
-        if verificacion_horizontal(matriz, i):
-            retorno.append([1, i])
-    
-    for i in range(len(matriz)):
-        if verificacion_vertical(matriz, i):
-            retorno.append([2, i])
-
-    if verificacion_diagonal(matriz):
-        retorno.append([3,-1])
-    
-    if verificacion_diagonal_inversa(matriz):
-        retorno.append([4, -1])
-
-    return retorno
 
 def continuar():
     """Función para cuando se quiere continuar entre rondas"""
