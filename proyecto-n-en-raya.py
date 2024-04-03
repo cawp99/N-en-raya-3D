@@ -240,13 +240,29 @@ def casilla_presionada(event): #solo para botones de casilla
     global nivel
     
     #extraemos el nivel
-    pos_y = event.widget.winfo_y()
+    ventana.update()
+    coords = event.widget.master
+    pos_y = coords.winfo_pointery() - ventana.winfo_rooty()
+
+    print(f"pos_y vale {pos_y}")
 
     #comparamos con los niveles guardados, nos quedamos con el inmediato menor 
-    for i in range(1, len(niveles_y)):
-        nivel = niveles_y[i-1][0]
-        if pos_y < niveles_y[i][1]:
+    for i in range(len(niveles_y)+1):
+        print(f"bucle para hallar nivel. i vale {i}. pos_y vale {pos_y}")
+        if i == len(niveles_y):
+            print("Caso borde. Último nivel")
+            nivel = niveles_y[-1][0]
             break
+        else:
+            print(f"Caso normal.")
+            nivel = niveles_y[i][0]-1
+            print(f"nivel vale {nivel}")
+        
+        if pos_y < niveles_y[i][1]:
+            print("Se cumplió")
+            break
+        else:
+            print("No se cumple. Siguiente")
 
     print(f"Nivel de la casilla seleccionada: {nivel}")
 
@@ -283,7 +299,9 @@ def imprimir_tablero(n: int):
     frame_botones = tk.Frame(tableros, pady=20)
     frame_botones.pack()
 
-    posicion_y = frame_botones.winfo_y()
+    ventana.update()
+
+    posicion_y = frame_botones.winfo_rooty() - ventana.winfo_rooty()
     niveles_y.append([n, posicion_y])
 
     for i in range(tamaño):
