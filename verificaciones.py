@@ -1,6 +1,7 @@
 # Un archivo que contenga las funciones de verificación para la matriz
 
 from typing import List
+import logging
 
 def hay_ganador(hipermatriz:List[List[List[int]]], matriz:List[List[int]], turn:int)->int:
     """
@@ -15,45 +16,83 @@ def hay_ganador(hipermatriz:List[List[List[int]]], matriz:List[List[int]], turn:
     int: 0 si no hay ganador, 1 si gana el jugador que tiene las "X", 2 si gana el 
     jugador que tiene las "O"
     """
+    logging.info("se ejecuta hay_ganador")
+    logging.debug("hipermatriz:")
+    logging.debug(str(hipermatriz))
+    logging.debug("matriz")
+    logging.debug(str(matriz))
 
     victorias=verificacion_completa(hipermatriz, matriz)
+
+    logging.debug("victorias: " + str(victorias))
+
     if len(victorias) == 0:
         return 0
     
     #si hay algunas filas o columnas o diagonales de entradas iguales
     for linea in victorias:
+        logging.debug(f"linea es {str(linea)}")
+
+        #extraemos la linea, columna, diagonal, diagonal inversa, intertablero
+        queue : List[int] = []
+
         if linea[0]==1: #se trata de una fila
-            if matriz[linea[1]][0] == 0:
+            for i in range(len(matriz)):
+                queue.append(matriz[linea[1]][i])
+
+            if queue[0] == 0:
                 continue #ignora si son filas de entradas iguales vacías
-            else:
-                return turn 
+            elif queue[0] != 3:
+                return turn
+            elif queue[0] == 3:
+                if (1 not in queue) and (2 not in queue):
+                    continue #vacía
             
         elif linea[0]==2: #se trata de una columna
+            for i in range(len(matriz)):
+                queue.append(matriz[i][linea[1]])
+
             if matriz[0][linea[1]] == 0:
                 continue #ignora si son columnas de entradas iguales vacías
-            else:
+            elif queue[0] != 3:
                 return turn
+            elif queue[0] == 3:
+                if (1 not in queue) and (2 not in queue):
+                    continue #vacía
             
         elif linea[0]==3: #diagonal principal
+            for i in range(len(matriz)):
+                queue.append(matriz[i][i])
+
             if matriz[0][0] == 0:
                 continue #ignora si son digonales de entradas iguales vacías
-            else:
+            elif queue[0] != 3:
                 return turn
+            elif queue[0] == 3:
+                if (1 not in queue) and (2 not in queue):
+                    continue #vacía
             
         elif linea[0]==4: #diagonal secundaria
+            for i in range(len(matriz)):
+                queue.append(matriz[len(matriz)-1-i][i])
+
             if matriz[len(matriz)-1][0] == 0:
                 continue #ignora si son digonales de entradas iguales vacías
-            else:
+            elif queue[0] != 3:
                 return turn
+            elif queue[0] == 3:
+                if (1 not in queue) and (2 not in queue):
+                    continue #vacía
             
         elif linea[0]==5: #linea intertablero
-            #print("linea intertablero")
+            logging.debug("linea intertablero")
             fila = linea[1]
             columna = linea[2]
-            #print(f"fila {fila}, columna {columna}")
+            logging.debug(f"fila {fila}, columna {columna}")
             if hipermatriz[0][fila][columna] == 0:
                 continue #ignora interlineas nulas
             else:
+                logging.debug(f"victoria! para {turn}")
                 return turn
             
 
@@ -247,7 +286,7 @@ def verificacion_completa(hipermatriz:List[List[List[int]]], matriz:List[List[in
     for i in range(len(matriz)):
         for j in range(len(matriz)):
             if verificacion_intertablero(hipermatriz, i, j):
-                #print(f"linea intertablero encontrada: {i},{j}")
+                logging.debug(f"linea intertablero encontrada: {i},{j}")
                 retorno.append([5, i, j])
 
 

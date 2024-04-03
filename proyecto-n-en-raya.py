@@ -40,6 +40,8 @@ def pedir_datos():
     global nombre2
     global entry_tamaño
 
+    logging.info("se ejecuta pedir_datos")
+
     datos = tk.Frame(main_frame)
     datos.pack()
 
@@ -80,8 +82,12 @@ def guardar_nombres():
 
     global nombre_jug1
     global nombre_jug2
+
+    logging.info("se ejecuta guardar_nombres")
     nombre_jug1 = nombre1.get()
     nombre_jug2 = nombre2.get()
+
+
 
 
 def guardar_tamaño()->int:
@@ -94,6 +100,7 @@ def guardar_tamaño()->int:
     global entry_tamaño
     global tamaño
 
+    logging.info("se ejecuta guardar_tamaño")
     tamaño_temp = entry_tamaño.get()
     try:
         tamaño_temp = int(tamaño_temp)
@@ -109,6 +116,7 @@ def guardar_datos()->bool:
     """Una función para guardar los datos y empezar el juego
     """
 
+    logging.info("se ejecuta guardar_datos")
     datos_guardados = False
 
     guardar_nombres()
@@ -133,31 +141,42 @@ def guardar_datos()->bool:
         empezar_juego()
 
 def eliminar_ventana():
+    """Elimina la ventana"""
+    logging.info("eliminar ventana")
     main_frame.destroy()
 
 def iniciar_ventana():
+    """Inicia la ventana"""
+    logging.info("iniciar ventana")
     global main_frame 
     main_frame = tk.Frame(ventana)
     main_frame.pack()
 
 def reiniciar_ventana():
+    """Reinicia el marco main_frame"""
+    logging.info("Se ejecuta reiniciar_ventana")
     eliminar_ventana()
     iniciar_ventana()
 
 def eliminar_tableros():
+    logging.info("eliminar tableros")
     tableros.destroy()
 
 def iniciar_tableros():
+    logging.info("iniciar tableros")
     global tableros 
     tableros = tk.Frame(main_frame)
     tableros.pack()
 
 def reiniciar_tableros():
+    """Una función que reinicia el frame de tableros"""
+    logging.info("reiniciar_tableros")
     eliminar_tableros()
     iniciar_tableros()
 
 def menu_inicial():
     """Una función que muestra el menú inicial"""
+    logging.info("Menú inicial")
     
     reiniciar_ventana()
 
@@ -170,6 +189,8 @@ def menu_inicial():
 
 def empezar_juego(first:bool = True):
     """Genera el tablero y empieza el juego"""
+
+    logging.info("empezar juego...")
     global Jugador1
     global Jugador2
     global tablero 
@@ -181,7 +202,7 @@ def empezar_juego(first:bool = True):
         Jugador2 = clases.Jugador(nombre_jug2, "O")
 
     tablero = clases.Tablero_3D(Jugador1, Jugador2, tamaño)
-    #print("Juego creado")
+    logging.debug("Juego creado")
 
     reiniciar_ventana()
     datos_tablero()
@@ -206,7 +227,7 @@ def nombre_del_turno()->str:
         return getattr(Jugador2, 'nombre')
     
 def actualizar_nombre_turno():
-    """Actualiza el nombre de la etiqueta label_turno"""
+    """Actualiza el nombre de la etiqueta label_turno cada 100 ms"""
     label_turno.config(text=f"El turno actual es de {nombre_del_turno()}")
     label_turno.after(100, actualizar_nombre_turno)
 
@@ -217,10 +238,10 @@ def datos_tablero():
     datos = tk.Frame(main_frame)
     datos.pack()
 
-    label_jug1:tk.Label = tk.Label(datos, text=f"El jugador 1 es {getattr(Jugador1, 'nombre')}")
+    label_jug1:tk.Label = tk.Label(datos, text=f"El jugador 1 es {getattr(Jugador1, 'nombre')}. Ficha X")
     label_jug1.grid(row=0, column=0, padx=10)
 
-    label_jug1:tk.Label = tk.Label(datos, text=f"El jugador 2 es {getattr(Jugador2, 'nombre')}")
+    label_jug1:tk.Label = tk.Label(datos, text=f"El jugador 2 es {getattr(Jugador2, 'nombre')}. Ficha O")
     label_jug1.grid(row=0, column=1, padx=10)
 
     label_puntaje_jug1:tk.Label = tk.Label(datos, text=f"Puntaje: {getattr(Jugador1, 'puntaje')}")
@@ -263,11 +284,11 @@ def casilla_presionada(event): #solo para botones de casilla
         continue_exec = False
 
     if continue_exec:
-        #print(f"Actualizamos la casilla {nivel},{fila},{columna}")
+        logging.debug(f"Actualizamos la casilla {nivel},{fila},{columna}")
         tablero.actualizar_casilla(nivel, fila, columna)
         casilla_act = tablero.estado[nivel][fila][columna]
         estado_nuevo = getattr(casilla_act, 'estado')
-        #print(f"estado de la casilla: {estado_nuevo}")
+        logging.debug(f"estado de la casilla: {estado_nuevo}")
         event.widget.config(bg="seashell4")
 
         if getattr(tablero,"turno")==1:
@@ -286,7 +307,7 @@ def verificar_ganador(hipermatriz:List[List[List[int]]], matriz:List[List[int]],
 
     candidato_ganador = verificaciones.hay_ganador(hipermatriz, matriz, turn)
     #print(str(hipermatriz))
-    #print(f"hay candidato_ganador: {candidato_ganador}")
+    logging.debug(f"hay candidato_ganador: {candidato_ganador}")
     if candidato_ganador == 0: #no hay ganador
         tablero.siguiente_turno()
         pass #continuamos
