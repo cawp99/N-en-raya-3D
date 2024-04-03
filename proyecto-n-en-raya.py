@@ -399,6 +399,8 @@ def ventana_fin_de_ronda(n:int):
     btn_continuar.pack()
     btn_menu.pack()
 
+    reiniciar_ventana()
+
 def menu_inicial_vg():
     menu_inicial()
     vg.destroy()
