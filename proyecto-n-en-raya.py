@@ -25,7 +25,7 @@ def iniciar_juego():
     """Función para iniciar el juego"""
     reiniciar_ventana()
     logging.info("Se ejecuta iniciar_juego")
-    print("El juego se está iniciando...")
+    #print("El juego se está iniciando...")
     pedir_datos()
 
 def salir_del_juego():
@@ -144,6 +144,18 @@ def reiniciar_ventana():
     eliminar_ventana()
     iniciar_ventana()
 
+def eliminar_tableros():
+    tableros.destroy()
+
+def iniciar_tableros():
+    global tableros 
+    tableros = tk.Frame(main_frame)
+    tableros.pack()
+
+def reiniciar_tableros():
+    eliminar_tableros()
+    iniciar_tableros()
+
 def menu_inicial():
     """Una función que muestra el menú inicial"""
     
@@ -162,14 +174,14 @@ def empezar_juego(first:bool = True):
     global Jugador2
     global tablero 
     global tableros
-    global niveles_y
+    global variable_nivel
     
     if first:
         Jugador1 = clases.Jugador(nombre_jug1, "X")
         Jugador2 = clases.Jugador(nombre_jug2, "O")
 
     tablero = clases.Tablero_3D(Jugador1, Jugador2, tamaño)
-    print("Juego creado")
+    #print("Juego creado")
 
     reiniciar_ventana()
     datos_tablero()
@@ -177,18 +189,10 @@ def empezar_juego(first:bool = True):
     #ahora creamos los tableros para los distintos niveles
     tableros = tk.Frame(main_frame)
     tableros.pack()
-    niveles_y = []
 
-    for n in range(tamaño):
-        label_nivel = tk.Label(tableros, text=f"Tablero de nivel: {n}")
-        label_nivel.pack()
-        imprimir_tablero(n)
+    variable_nivel = tk.IntVar()
 
-    print("Niveles guardados: " + str(niveles_y))
-
-    espacio_vertical=tk.Frame(main_frame)
-    espacio_vertical.config(height=20)
-    espacio_vertical.pack()
+    imprimir_tablero(0)
 
     btn_menu = tk.Button(main_frame, text="Menú Principal", command=menu_inicial)
     btn_menu.pack(side="bottom")
@@ -238,32 +242,11 @@ def casilla_presionada(event): #solo para botones de casilla
     fila = event.widget.grid_info()['row']
     columna = event.widget.grid_info()['column']
 
-    global nivel
+    global variable_nivel
     
-    #extraemos el nivel
-    ventana.update()
-    coords = event.widget.master
-    pos_y = coords.winfo_pointery() - ventana.winfo_rooty()
+    nivel = variable_nivel.get()
 
-    print(f"pos_y vale {pos_y}")
-
-    #comparamos con los niveles guardados, nos quedamos con el inmediato menor 
-    for i in range(len(niveles_y)+1):
-        #print(f"bucle para hallar nivel. i vale {i}. pos_y vale {pos_y}")
-        if i == len(niveles_y):
-            #print("Caso borde. Último nivel")
-            nivel = niveles_y[-1][0]
-            break
-        else:
-            #print(f"Caso normal.")
-            nivel = niveles_y[i][0]-1
-            #print(f"nivel vale {nivel}")
-        
-        if pos_y < niveles_y[i][1]:
-            #print("Se cumplió")
-            break
-
-    print(f"Nivel de la casilla seleccionada: {nivel}")
+    #print(f"Nivel de la casilla seleccionada: {nivel}")
 
     continue_exec = True
 
@@ -280,11 +263,11 @@ def casilla_presionada(event): #solo para botones de casilla
         continue_exec = False
 
     if continue_exec:
-        print(f"Actualizamos la casilla {nivel},{fila},{columna}")
+        #print(f"Actualizamos la casilla {nivel},{fila},{columna}")
         tablero.actualizar_casilla(nivel, fila, columna)
         casilla_act = tablero.estado[nivel][fila][columna]
         estado_nuevo = getattr(casilla_act, 'estado')
-        print(f"estado de la casilla: {estado_nuevo}")
+        #print(f"estado de la casilla: {estado_nuevo}")
         event.widget.config(bg="seashell4")
 
         if getattr(tablero,"turno")==1:
@@ -302,8 +285,8 @@ def verificar_ganador(hipermatriz:List[List[List[int]]], matriz:List[List[int]],
     """Verifica si alguien acaba de ganar en este turno"""
 
     candidato_ganador = verificaciones.hay_ganador(hipermatriz, matriz, turn)
-    print(str(hipermatriz))
-    print(f"hay candidato_ganador: {candidato_ganador}")
+    #print(str(hipermatriz))
+    #print(f"hay candidato_ganador: {candidato_ganador}")
     if candidato_ganador == 0: #no hay ganador
         tablero.siguiente_turno()
         pass #continuamos
@@ -321,21 +304,69 @@ def verificar_ganador(hipermatriz:List[List[List[int]]], matriz:List[List[int]],
 def imprimir_tablero(n: int):
     """Imprime el tablero de nivel `n` con menús para cada casilla:"""
 
-    global niveles_y
+    global variable_nivel
 
     frame_botones = tk.Frame(tableros, pady=20)
-    frame_botones.pack()
+    frame_botones.pack(side="bottom")
 
     ventana.update()
 
-    posicion_y = frame_botones.winfo_rooty() - ventana.winfo_rooty()
-    niveles_y.append([n, posicion_y])
+    info_nivel = tk.Frame(tableros)
+    info_nivel.pack()
+
+    label_nivel = tk.Label(info_nivel, text=f"Nivel {n}")
+    label_nivel.pack(pady=10)
+
+    btns_nivel = tk.Frame(info_nivel)
+    btns_nivel.pack()
+    btn_subir_nivel = tk.Button(info_nivel, text="Subir nivel", command=subir_nivel)
+    btn_subir_nivel.pack(side="right", padx=10)
+    btn_bajar_nivel = tk.Button(info_nivel, text="Bajar nivel", command=bajar_nivel)
+    btn_bajar_nivel.pack(side="left", padx=10)
 
     for i in range(tamaño):
         for j in range(tamaño):
             boton = tk.Button(frame_botones, text = " ", padx=5, pady=5)
             boton.grid(row=i, column=j)
             boton.bind("<Button-1>", casilla_presionada)
+            #inicializamos con el valor correspondiente
+            hipermatriz = tablero.matriz_numerica()
+            if hipermatriz[n][i][j] == 1:
+                boton.config(text="X", fg="salmon", bg="seashell4")
+            elif hipermatriz[n][i][j] == 2:
+                boton.config(text="O", fg="SkyBlue1", bg="seashell4")
+
+
+
+def subir_nivel():
+    global variable_nivel
+
+    do_nothing = False
+
+    nivel = variable_nivel.get()
+    if nivel == tamaño - 1:
+        do_nothing = True
+
+    if not do_nothing:
+        variable_nivel.set(nivel + 1)
+        nivel = nivel + 1 
+        reiniciar_tableros()
+        imprimir_tablero(nivel)
+
+def bajar_nivel():
+    global variable_nivel
+
+    do_nothing = False
+
+    nivel = variable_nivel.get()
+    if nivel == 0:
+        do_nothing = True
+
+    if not do_nothing:
+        variable_nivel.set(nivel - 1)
+        nivel = nivel - 1 
+        reiniciar_tableros()
+        imprimir_tablero(nivel)
 
 def ventana_fin_de_ronda(n:int):
     """

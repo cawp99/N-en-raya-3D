@@ -50,7 +50,7 @@ def hay_ganador(hipermatriz:List[List[List[int]]], matriz:List[List[int]], turn:
             #print("linea intertablero")
             fila = linea[1]
             columna = linea[2]
-            print(f"fila {fila}, columna {columna}")
+            #print(f"fila {fila}, columna {columna}")
             if hipermatriz[0][fila][columna] == 0:
                 continue #ignora interlineas nulas
             else:
