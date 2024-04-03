@@ -3,7 +3,7 @@
 #se pueda simplemente pasar la parte grafica con tkinter como algo adicional
 #y modificable
 
-# probando editar en otra PC parte 2
+# probando editar en otra PC parte 3
 
 import clases
 import funciones
