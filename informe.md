@@ -90,4 +90,4 @@ Se recomienda no introducir valores muy grandes de lado para el tablero, realmen
 * Videos de YouTube:
     * Curso de tkinter: https://www.youtube.com/playlist?list=PL7HAy5R0ehQXb2aFKOKyeCMequxyb5jzJ
     * POO en Python: https://www.youtube.com/watch?v=JVNirg9qs4M&ab_channel=BitBoss
-    * StackOverflow: https://stackoverflow.com/
+    * StackOverflow: https://stackoverflow.com/dic
